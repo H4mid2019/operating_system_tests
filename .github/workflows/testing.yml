@@ -23,9 +23,9 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
         - name: Run tests
-          run: python -m scalene --json --outfile profile_${{ matrix.python-version }}_${{ matrix.os }}.json main.py
+          run: python -m scalene --html --outfile profile_${{ matrix.python-version }}_${{ matrix.os }}.html main.py
         - name: Upload report
           uses: actions/upload-artifact@v4
           with:
             name: profile_${{ matrix.python-version }}_${{ matrix.os }}
-            path: profile_${{ matrix.python-version }}_${{ matrix.os }}.json
+            path: profile_${{ matrix.python-version }}_${{ matrix.os }}.html

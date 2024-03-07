@@ -1,6 +1,6 @@
-from datetime import datetime
 from lzma import LZMACompressor
 from bz2 import BZ2Compressor
+import time
 
 
 def wallis(n):
@@ -9,7 +9,6 @@ def wallis(n):
         left = (2. * i) / (2. * i - 1.)
         right = (2. * i) / (2. * i + 1.)
         pi = pi * left * right
-    # print(len(str(pi)), 'decimals')
 
 
 def fib_range(n):
@@ -20,12 +19,6 @@ def fib_range(n):
             return fib(n - 1) + fib(n - 2)
     for i in range(1, n):
         fib(i)
-    # cpus = cpu_count()
-    # with ThreadPoolExecutor(max_workers=cpus) as executor:
-    #     fibs = [executor.submit(fib, i) for i in range(1, n)]
-    #     with total=n) as pbar:
-    #         for future in as_completed(fibs):
-    #             pbar.update()
 
 
 def fib_loop(n):
@@ -35,7 +28,6 @@ def fib_loop(n):
         nxt = f + s
         f = s
         s = nxt
-    # print(len(str(s)), 'decimals')
 
 
 def compress(n, c_class, c_args=[]):
@@ -47,38 +39,30 @@ def compress(n, c_class, c_args=[]):
 
 
 def benchmnarks():
-    print('compressing bz2:')
-    start = datetime.now()
-    compress(n=2**15, c_class=BZ2Compressor, c_args=[1])
-    print('benchmark time bz2:', datetime.now() - start)
+    benchmarks = [
+        ("compressing bz2", compress, (2**15, BZ2Compressor, [1])),
+        ("compressing lzma", compress, (2**15, LZMACompressor)),
+        ("calculating pi", wallis, [2**25]),
+        ("calculating fib recursive", fib_range, [2**5 + 2**2 + 2]),
+        ("calculating fib iterative", fib_loop, [2**20])
+    ]
 
-    print('compressing lzma:')
-    start = datetime.now()
-    compress(n=2**15, c_class=LZMACompressor)
-    print('benchmark time lzma:', datetime.now() - start)
-
-    print('calculating pi:')
-    start = datetime.now()
-    wallis(2**25)
-    print('benchmark time pi:', datetime.now() - start)
-
-    print('calculating fib recursive:')
-    start = datetime.now()
-    fib_range(2**5 + 2**2 + 2)
-    print('benchmark time fib recursive:', datetime.now() - start)
-
-    print('calculating fib iterative:')
-    start = datetime.now()
-    fib_loop(2**20)
-    print('benchmark time fib iterative:', datetime.now() - start)
+    for benchmark in benchmarks:
+        name, func, args = benchmark
+        print(name + " started")
+        t1 = time.perf_counter(), time.process_time()
+        func(*args)
+        t2 = time.perf_counter(), time.process_time()
+        print(name + " finished")
+        print(f" Real time: {t2[0] - t1[0]:.2f} seconds\nCPU time: {t2[1] - t1[1]:.2f} seconds")
 
 
 def main():
-    start = datetime.now()
+    t1 = time.perf_counter(), time.process_time()
     benchmnarks()
-    end = datetime.now()
-    result = end - start
-    print('benchmark time:', result)
+    t2 = time.perf_counter(), time.process_time()
+    print("All benchmarks finished")
+    print(f"Real time: {t2[0] - t1[0]:.2f} seconds\nCPU time: {t2[1] - t1[1]:.2f} seconds")
 
 
 if __name__ == "__main__":
